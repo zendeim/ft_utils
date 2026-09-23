@@ -1,6 +1,5 @@
 #pragma once
 #include "core.hpp"
-#include "webserv.hpp"
 #include "Span.hpp"
 
 /* (IMPORTANT) Field matching presumes 24 byte padding
@@ -14,9 +13,6 @@ Returns: 0 on no matches or
 TODO:	Finding can be two operations, Setting or can be one operation
 		Move table to init, Automate the creation of the enums from the table
 */
-
-namespace fn {
-//
 
 ATTR(static_inl, pure)
 Span find_last_dot(Span span) {
@@ -73,21 +69,20 @@ isize s_match(const u8* ptr, usize length, const u8 (&ltable)[count][size]) {
 	return 0;
 }
 
-ATTR(static_inl, pure, flatten)
-Field match_field(Span field) {
-	static const u8 ltable[][24] = FIELD_TABLE;
+// ATTR(static_inl, pure, flatten)
+// Field match_field(Span field) {
+// 	static const u8 ltable[][24] = FIELD_TABLE;
 
-	return (Field)s_match((u8*)field.ptr, field.size, ltable);
-}
+// 	return (Field)s_match((u8*)field.ptr, field.size, ltable);
+// }
 
-ATTR(static_inl, pure, flatten)
-Mime match_mime(Span target) {
-	static const u8 ltable[][8] = MIME_TABLE;
-	Span ext = find_dot(target);
+// ATTR(static_inl, pure, flatten)
+// Mime match_mime(Span target) {
+// 	static const u8 ltable[][8] = MIME_TABLE;
+// 	Span ext = find_dot(target);
 
-	return (Mime)s_match((u8*)ext.ptr, ext.size, ltable);
-}
-}
+// 	return (Mime)s_match((u8*)ext.ptr, ext.size, ltable);
+// }
 
 // static inline
 // Span find_dot(Span span) {

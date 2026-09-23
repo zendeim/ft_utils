@@ -1,12 +1,8 @@
 #pragma once
 #include "core.hpp"
-#include "webserv.hpp"
 #include "Span.hpp"
 
-namespace fn {
-//
-
-ATTR(inl)	// REVIEW : should be static_inl no?
+ATTR(static_inl)
 Span itoa10(usize number, char* buffer, usize bufferSize) {
 	ASSERT(bufferSize >= 20, "Buffer isn't big enough for itoa");
 	char* ptr = buffer + bufferSize;
@@ -20,7 +16,7 @@ Span itoa10(usize number, char* buffer, usize bufferSize) {
 	return result;
 }
 
-ATTR(inl)
+ATTR(static_inl)
 Span itoa16(usize number, char* buffer, usize bufferSize) {
 	static const char digits[16] = {
 		'0', '1', '2', '3', '4', '5', '6', '7',
@@ -74,5 +70,4 @@ usize qstrtol16(const char* src, usize minLength = 1, usize maxLength = 15) {
 	}
 	const usize length = (usize)(ptr - buffer);
 	return length >= minLength && length <= maxLength ? value : SIZE_MAX;
-}
 }

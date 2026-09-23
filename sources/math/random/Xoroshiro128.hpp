@@ -44,11 +44,11 @@ struct Xoroshiro128 {
 	u64 next() {
 		const u64 s0 = stateLow[0];
 		u64 s1 = stateHigh[0];
-		const u64 result = Random::rotl(s0 + s1, 17) + s0;
+		const u64 result = ROTL(s0 + s1, 17) + s0;
 
 		s1 ^= s0;
-		stateLow[0] = Random::rotl(s0, 49) ^ s1 ^ (s1 << 21);
-		stateHigh[0] = Random::rotl(s1, 28);
+		stateLow[0] = ROTL(s0, 49) ^ s1 ^ (s1 << 21);
+		stateHigh[0] = ROTL(s1, 28);
 		return result;
 	}
 
@@ -56,11 +56,11 @@ struct Xoroshiro128 {
 	u64x4 next4() {
 		const u64x4 s0 = stateLow;
 		u64x4 s1 = stateHigh;
-		const u64x4 result = Random::vec_rotl(s0 + s1, 17) + s0;
+		const u64x4 result = ROTL(s0 + s1, 17) + s0;
 
 		s1 ^= s0;
-		stateLow = Random::vec_rotl(s0, 49) ^ s1 ^ (s1 << 21);
-		stateHigh = Random::vec_rotl(s1, 28);
+		stateLow = ROTL(s0, 49) ^ s1 ^ (s1 << 21);
+		stateHigh = ROTL(s1, 28);
 		return result;
 	}
 

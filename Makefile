@@ -2,7 +2,6 @@
 NAME = main
 VPATH := $(shell find sources -type d)
 SRC = main.cpp
-SRC_TEST = test.cpp
 LDLIBS =
 ARG = assets/configs/default.conf
 
@@ -24,9 +23,8 @@ ASAN = -fsanitize=address,undefined,leak -fno-omit-frame-pointer
 TSAN = -fsanitize=thread -fno-omit-frame-pointer
 FAST = -march=native -O3 -ffast-math -fstrict-aliasing
 
-WARN_IGNORE = -Wno-gnu-statement-expression-from-macro-expansion -Wno-gnu-anonymous-struct
+WARN_IGNORE = -Wno-gnu-statement-expression-from-macro-expansion -Wno-gnu-anonymous-struct -Wno-gnu-auto-type
 
-TEST = -O3 -march=native
 # Pattern Rules: Compilation ------------------ #
 $(OBJ_PATH)/%.o: %.cpp | $(OBJ_PATH)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(WARN_IGNORE) -c $< -o $@
@@ -47,11 +45,6 @@ all: $(BIN)
 run:
 	clear
 	./$(BIN) $(ARG)
-
-test: CXXFLAGS += $(TEST)
-test:
-	$(MAKE) clean
-	$(MAKE) SRC="$(SRC_TEST)" CXXFLAGS="$(CXXFLAGS)" all
 
 vrun:
 	clear
@@ -84,4 +77,4 @@ fast: CXXFLAGS += $(FAST)
 #fast: LDFLAGS += -flto
 fast: clean $(BIN)
 
-.PHONY: all run vrun compdb clean fclean re debug asan tsan fast test
+.PHONY: all run vrun compdb clean fclean re debug asan tsan fast

@@ -5,7 +5,6 @@
 #include <unistd.h>
 
 #include "core.hpp"
-#include "pure_functions.hpp"
 #include "HWTimer.hpp"
 
 /*	Clock:

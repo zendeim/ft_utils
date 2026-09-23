@@ -1,10 +1,8 @@
 #pragma once
 #include <emmintrin.h>
+#include <unistd.h>
 
 #include "core.hpp"
-#include "webserv.hpp"
-#include "Span.hpp"
-namespace fn {
 
 ATTR(static_inl, pure)
 bool q16strcasecmp(const char* str, const char* ref, usize length) {
@@ -17,6 +15,4 @@ bool q16strcasecmp(const char* str, const char* ref, usize length) {
 	usize mask = ~((usize)_mm_movemask_epi8(eq));
 	usize matchIndex = (usize)CTZ(mask);
 	return matchIndex >= length;
-}
-
 }

@@ -5,8 +5,6 @@
 
 #include "core.hpp"
 
-namespace fn {
-
 // Overreads at most 15 bytes
 ATTR(static_inl)
 void* q16memchr(void* vstr, u8 c, usize length) {
@@ -107,8 +105,6 @@ void* q32memrchr(void* vstr, u8 c, usize length) {
 	if (match == end)
 		return (tmp == c) ? end : NULL;
 	return match;
-}
-
 }
 
 #ifdef __AVX2__

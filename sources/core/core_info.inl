@@ -1,5 +1,6 @@
 #pragma once
 #include <limits>
+#include <climits>
 
 #include "core.hpp"
 
@@ -14,8 +15,6 @@
 #define WORD_SIZE	sizeof(size_t)
 #define WORD_BITS	(WORD_SIZE * CHAR_BIT)
 
-// Kernel configurations
-#define MAX_FILE_SIZE (1ul << 48)	// 256 TiB
 #define MAX_PATH_SIZE (4096ul)
 
 #ifdef PIPE_BUF

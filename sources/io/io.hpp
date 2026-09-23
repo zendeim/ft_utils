@@ -1,8 +1,4 @@
 #pragma once
-// #include <unistd.h>
-// #include <sys/socket.h>
-// #include <netinet/in.h>
-// #include <netdb.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <sys/stat.h>
@@ -10,8 +6,6 @@
 #include "core.hpp"
 #include "Arena.hpp"
 #include "Span.hpp"
-
-namespace fn {
 
 // ATTR(always_inline)
 // Span alloc_whole_file(Arena& arena, const char* filePath, int& fd, usize padSize = 32, usize minSize = 0, usize maxSize = UINT32_MAX) {
@@ -59,7 +53,7 @@ int open_with_info(int dirFd, struct stat* st, const char* filePath, int flags, 
 	if (fd == -1)
 		return -1;
 	if (fstat(fd, st) == -1)
-		return fn::close_noerr(fd);
+		return close_noerr(fd);
 	return fd;
 }
 
@@ -115,6 +109,4 @@ bool read_whole_file(Arena& arena, const char* filePath, Span& file, usize padSi
 	file.ptr = (char*)ptr;
 	file.size = fileSize;
 	return 0;
-}
-
 }

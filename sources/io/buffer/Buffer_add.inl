@@ -81,7 +81,7 @@ BUFFER_INL
 (Span) append_digit10(usize number) {
 	const usize maxLength = 24;
 	char buffer[maxLength * 2];
-	Span digit = fn::itoa10(number, buffer, maxLength);
+	Span digit = itoa10(number, buffer, maxLength);
 
 	char* optr = (char*)data + writePos;
 	MEMCPY_INLINE(optr, digit.ptr, maxLength);
@@ -93,7 +93,7 @@ BUFFER_INL
 (Span) append_digit16(usize number) {
 	const usize maxLength = 16;
 	char buffer[maxLength * 2];
-	Span digit = fn::itoa16(number, buffer, maxLength);
+	Span digit = itoa16(number, buffer, maxLength);
 
 	char* optr = (char*)data + writePos;
 	MEMCPY_INLINE(optr, digit.ptr, maxLength);

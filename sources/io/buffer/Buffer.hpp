@@ -4,7 +4,6 @@
 
 #include "core.hpp"
 #include "Span.hpp"
-#include "pure_functions.hpp"
 #include <errno.h>
 
 #define BUFFER_INL(retType) \
@@ -54,7 +53,6 @@ struct Buffer {
 	isize read_compact(int fd, usize bytes);
 	isize read(int fd, usize bytes);
 	isize write(int fd, usize bytes);
-	isize write_all(int fd, usize bytes);
 	char* readdir(int fd);
 
 	// Search
@@ -74,8 +72,6 @@ struct Buffer {
 	template <usize N> Span prepend_inline(const char* ptr, usize length);
 	Span prepend(const char* ptr, usize length);
 	Span prepend(const Span& span);
-
-	// Append Special
 
 	Span append_digit10(usize number);
 	Span append_digit16(usize number);
