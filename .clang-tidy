@@ -1,0 +1,19 @@
+---
+Checks: >-
+  -*,
+  clang-analyzer-*,
+  bugprone-*,
+  -bugprone-easily-swappable-parameters,
+  performance-*,
+  portability-*,
+  cert-*,
+  -cert-err58-cpp,
+  misc-*,
+  -misc-definitions-in-headers,
+  -misc-non-private-member-variables-in-classes,
+  -misc-use-anonymous-namespace,
+  -misc-use-internal-linkage
+
+WarningsAsErrors: ''
+HeaderFilterRegex: '^(src|include|tests|sources)/'
+FormatStyle: file

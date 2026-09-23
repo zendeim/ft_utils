@@ -1,37 +1,41 @@
 # Configuration ------------------------------- #
-NAME = libft.a
-BUILD_PATH = build
-INC_PATH = includes
-OBJ_PATH = $(BUILD_PATH)/obj
-BIN = $(BUILD_PATH)/$(NAME)
-VPATH = sources sources/string sources/memory sources/io sources/misc
+NAME = main
+VPATH := $(shell find sources -type d)
+SRC = main.cpp
+SRC_TEST = test.cpp
+LDLIBS =
+ARG = assets/configs/default.conf
 
-# Files --------------------------------------- #
-LIBS =
-SRCS = str_copy.c
-OBJS = $(addprefix $(OBJ_PATH)/, $(SRCS:.c=.o))
+# Defaults ------------------------------------ #
+.DEFAULT_GOAL := re # This is intentional. Project is small, compilation is fast
+RM := rm -f
+BUILD_PATH = build
+OBJ_PATH = $(BUILD_PATH)/obj
+BIN = build/$(NAME)
+OBJ = $(addprefix $(OBJ_PATH)/, $(SRC:.cpp=.o))
 
 # Flags --------------------------------------- #
-CC = clang
-CFLAGS = -Wall -Wextra $(addprefix -I,$(INC_PATH)) -flto -fstrict-aliasing
-LFLAGS =
-DEBUG = -g -Wpedantic -Wcast-qual -Wfloat-equal -Wswitch-default -Wsign-conversion
-SANITIZERS = -fsanitize=address,undefined,leak -fno-omit-frame-pointer
-FAST = -march=native -O3 -ffast-math
+CXX = clang++
+CPPFLAGS = $(addprefix -I,$(VPATH))
+CXXFLAGS = -Wall -Wextra -O2 -std=c++23 -fno-exceptions
+LDFLAGS = -nostdlib++ # Insane that just linking with stdlib++ accrues a 70kb allocation for exception pools (WITH EXCEPTIONS DISABLED!)
+DEBUG = -g -DDEBUG_MODE -O0 -Wpedantic -Wshadow -Wcast-qual -Wfloat-equal -Wswitch-default -Wconversion -Wsign-conversion
+ASAN = -fsanitize=address,undefined,leak -fno-omit-frame-pointer
+TSAN = -fsanitize=thread -fno-omit-frame-pointer
+FAST = -march=native -O3 -ffast-math -fstrict-aliasing
 
-# Pattern Rule -------------------------------- #
-$(OBJ_PATH)/%.o: %.c | $(OBJ_PATH)
-	$(CC) $(CFLAGS) -c $< -o $@
+WARN_IGNORE = -Wno-gnu-statement-expression-from-macro-expansion -Wno-gnu-anonymous-struct
 
-# # Linking Rule -------------------------------- #
-# $(BIN): $(OBJS) | $(BUILD_PATH)
-# 	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LIBS) $(LFLAGS)
+TEST = -O3 -march=native
+# Pattern Rules: Compilation ------------------ #
+$(OBJ_PATH)/%.o: %.cpp | $(OBJ_PATH)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(WARN_IGNORE) -c $< -o $@
 
-# Linking Rule
-$(BIN): $(OBJS)
-	ar rcs -o $@ $(OBJS)
+# Linking
+$(BIN): $(OBJ) | $(BUILD_PATH)
+	$(CXX) $(LDFLAGS) -o $@ $(OBJ) $(LDLIBS)
 
-# Directory Rule ------------------------------ #
+# Directory
 $(OBJ_PATH):
 	@mkdir -p $@
 $(BUILD_PATH):
@@ -40,18 +44,44 @@ $(BUILD_PATH):
 # Phonies ------------------------------------- #
 all: $(BIN)
 
-debug: CFLAGS += $(DEBUG) $(SANITIZERS)
-debug: clean $(BIN)
+run:
+	clear
+	./$(BIN) $(ARG)
 
-fast: CFLAGS += $(FAST)
-fast: clean $(BIN)
+test: CXXFLAGS += $(TEST)
+test:
+	$(MAKE) clean
+	$(MAKE) SRC="$(SRC_TEST)" CXXFLAGS="$(CXXFLAGS)" all
+
+vrun:
+	clear
+	valgrind ./$(BIN) $(ARG)
+
+compdb: | $(BUILD_PATH)
+	$(RM) $(BUILD_PATH)/compile_commands.json
+	bear --output $(BUILD_PATH)/compile_commands.json -- $(MAKE) clean asan
 
 clean:
-	rm -f $(OBJS)
+	$(RM) -r $(OBJ_PATH)
 
 fclean: clean
-	rm -f $(BIN)
+	$(RM) $(BIN)
 
 re: fclean all
 
-.PHONY: all clean fclean re fast debug
+debug: CXXFLAGS += $(DEBUG)
+debug: clean $(BIN)
+
+asan: CXXFLAGS += $(DEBUG) $(ASAN)
+asan: LDFLAGS += $(ASAN)
+asan: clean $(BIN)
+
+tsan: CXXFLAGS += $(DEBUG) $(TSAN)
+tsan: LDFLAGS += $(TSAN)
+tsan: clean $(BIN)
+
+fast: CXXFLAGS += $(FAST)
+#fast: LDFLAGS += -flto
+fast: clean $(BIN)
+
+.PHONY: all run vrun compdb clean fclean re debug asan tsan fast test
