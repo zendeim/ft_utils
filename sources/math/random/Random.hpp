@@ -4,7 +4,6 @@
 // global / local, constant / mutable, inline / 
 
 struct Random {
-
 	ATTR(static_inl, const)
 	u64 splitmix64(u64 seed) {
 		u64 result = seed + 0x9E3779B97f4A7C15;
@@ -32,5 +31,4 @@ struct Random {
 		MEMCPY_INLINE(&floatResult, &intResult, sizeof(floatResult));
 		return floatResult - 1.0f;
 	}
-
 };

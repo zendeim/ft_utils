@@ -6,34 +6,28 @@
 
 /*
 	Uses 
-
 	https://prng.di.unimi.it/xoroshiro128plus.c
 
 	TODO: 
-		1) See if mixing + and ++ is bad
-		2) Create SIMD RNG generation
-		3) Change to Xoroshiro +
 		4) Make SIMD generate x8
-		5) remove constructor init
-		6) Mix SFC64/ romu duo jr
 */
-struct Xoroshiro128 {
-	static_inl u64x4 stateLow;
-	static_inl u64x4 stateHigh;
 
-	ATTR(static_inl, constructor)
-	void init() {
-		u64 seed = __rdtsc();
-		for (usize i = 0; i < 4; i++) {
-			stateLow[i] = Random::splitmix64(seed);
-			stateHigh[i]= Random::splitmix64(stateLow[i]);
-			seed = stateHigh[i];
-		}
-	}
+struct Xoroshiro128 {
+	#ifdef __AVX512F__
+		typedef u64x8 vecType;
+		static_inl u64x8 stateLow = {0xE220A8397B1DCDAFULL, 0x06C45D188009454FULL, 0x1B39896A51A8749BULL, 0x2C829ABE1F4532E1ULL,
+			0x3EE5789041C98AC3ULL, 0x657EECDD3CB13D09ULL, 0x8621A03FE0BBDB7BULL, 0xB54E0F1600CC4D19ULL};
+		static_inl u64x8 stateHigh = {0x6E789E6AA1B965F4ULL, 0xF88BB8A8724C81ECULL, 0x53CB9F0C747EA2EAULL, 0xC584133AC916AB3CULL,
+			0xF3B8488C368CB0A6ULL, 0xC2D326E0055BDEF6ULL, 0x8E1F7555983AA92FULL, 0x84BB3F97971D80ABULL};
+	#else
+		typedef u64x4 vecType;
+		static_inl u64x4 stateLow = {0xE220A8397B1DCDAFULL, 0x06C45D188009454FULL, 0x1B39896A51A8749BULL, 0x2C829ABE1F4532E1ULL};
+		static_inl u64x4 stateHigh = {0x6E789E6AA1B965F4ULL, 0xF88BB8A8724C81ECULL, 0x53CB9F0C747EA2EAULL, 0xC584133AC916AB3CULL};
+	#endif
 
 	ATTR(static_inl)
 	void seed(u64 seed = __rdtsc()) {
-		for (usize i = 0; i < 4; i++) {
+		for (usize i = 0; i < ARRAY_SIZE(stateLow); i++) {
 			stateLow[i] = Random::splitmix64(seed);
 			stateHigh[i]= Random::splitmix64(stateLow[i]);
 			seed = stateHigh[i];
@@ -41,41 +35,41 @@ struct Xoroshiro128 {
 	}
 
 	ATTR(static_inl)
-	u64 next() {
-		const u64 s0 = stateLow[0];
-		u64 s1 = stateHigh[0];
-		const u64 result = ROTL(s0 + s1, 17) + s0;
+	u64 next(usize stateIndex = 0) {
+		const u64 s0 = stateLow[stateIndex];
+		u64 s1 = stateHigh[stateIndex];
+		const u64 result = s0 + s1;
 
 		s1 ^= s0;
-		stateLow[0] = ROTL(s0, 49) ^ s1 ^ (s1 << 21);
-		stateHigh[0] = ROTL(s1, 28);
+		stateLow[stateIndex] = ROTL(s0, 24) ^ s1 ^ (s1 << 16);
+		stateHigh[stateIndex] = ROTL(s1, 37);
 		return result;
 	}
 
 	ATTR(static_inl)
-	u64x4 next4() {
-		const u64x4 s0 = stateLow;
-		u64x4 s1 = stateHigh;
-		const u64x4 result = ROTL(s0 + s1, 17) + s0;
+	vecType vec_next() {
+		const vecType s0 = stateLow;
+		vecType s1 = stateHigh;
+		const vecType result = s0 + s1;
 
 		s1 ^= s0;
-		stateLow = ROTL(s0, 49) ^ s1 ^ (s1 << 21);
-		stateHigh = ROTL(s1, 28);
+		stateLow = ROTL(s0, 24) ^ s1 ^ (s1 << 16);
+		stateHigh = ROTL(s1, 37);
 		return result;
 	}
 
 	ATTR(static_inl)
 	void random_range(u8* dst, usize length) {
-		const usize bodyLength = length - length % sizeof(u64x4);
-		const usize tailLength = length % sizeof(u64x4);
+		const usize bodyLength = length - length % sizeof(vecType);
+		const usize tailLength = length % sizeof(vecType);
 
-		for (usize i = 0; i < bodyLength; i += sizeof(u64x4)) {
-			u64x4 randomValues = next4();
-			MEMCPY_INLINE(dst + i, &randomValues, sizeof(u64x4));
+		for (usize i = 0; i < bodyLength; i += sizeof(vecType)) {
+			vecType randomValues = vec_next();
+			MEMCPY_INLINE(dst + i, &randomValues, sizeof(vecType));
 		}
 
 		if (tailLength) {
-			u64x4 randomValues = next4();
+			vecType randomValues = vec_next();
 			u8* ptr = (u8*) &randomValues;
 			dst += bodyLength;
 			for (usize i = 0; i < tailLength; i++)
@@ -86,16 +80,16 @@ struct Xoroshiro128 {
 	ATTR(static_inl)
 	void random_range(u8* dst, usize length, u8 mask) {
 		const u64 vecMask = (u64)mask * 0x0101010101010101ull;
-		const usize bodyLength = length - length % sizeof(u64x4);
-		const usize tailLength = length % sizeof(u64x4);
+		const usize bodyLength = length - length % sizeof(vecType);
+		const usize tailLength = length % sizeof(vecType);
 
-		for (usize i = 0; i < bodyLength; i += sizeof(u64x4)) {
-			u64x4 randomValues = next4() & vecMask;
-			MEMCPY_INLINE(dst + i, &randomValues, sizeof(u64x4));
+		for (usize i = 0; i < bodyLength; i += sizeof(vecType)) {
+			vecType randomValues = vec_next() & vecMask;
+			MEMCPY_INLINE(dst + i, &randomValues, sizeof(vecType));
 		}
 
 		if (tailLength) {
-			u64x4 randomValues = next4();
+			vecType randomValues = vec_next();
 			u8* ptr = (u8*) &randomValues;
 			dst += bodyLength;
 			for (usize i = 0; i < tailLength; i++)
@@ -103,23 +97,23 @@ struct Xoroshiro128 {
 		}
 	}
 
-	ATTR(static_inl)	// xoroshiro128++ jump
-	void jump() {
-		static const u64 jumpTable[2] = {0x2bd7a6a6e99c2ddc, 0x0992ccaf6a6fca05};
+	ATTR(static_inl)
+	void jump(usize stateIndex = 0) {
+		static const u64 jumpTable[2] = {0xdf900294d8f554a5, 0x170865df4b3201fc};
 
 		u64 s0 = 0;
 		u64 s1 = 0;
 		for (usize i = 0; i < 2; i++) {
 			for (usize bitIndex = 0; bitIndex < 64; bitIndex++) {
 				if (jumpTable[i] & 1ull << bitIndex) {
-					s0 ^= stateLow[0];
-					s1 ^= stateHigh[0];
+					s0 ^= stateLow[stateIndex];
+					s1 ^= stateHigh[stateIndex];
 				}
-				next();
+				next(stateIndex);
 			}
 		}
-		stateLow[0] = s0;
-		stateHigh[0] = s1;
+		stateLow[stateIndex] = s0;
+		stateHigh[stateIndex] = s1;
 	}
 };
 

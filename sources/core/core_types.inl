@@ -2,6 +2,8 @@
 #include <cstddef>
 #include <stdint.h>
 
+#include "core_info.inl"
+
 typedef char				i8;
 typedef unsigned char		u8;
 typedef int16_t				i16;
@@ -26,6 +28,8 @@ typedef unsigned long		ulong;
 typedef u8 xmm __attribute__((vector_size(16)));
 typedef u8 ymm __attribute__((vector_size(32)));
 typedef u8 zmm __attribute__((vector_size(64)));
+typedef u8 wmm __attribute__((vector_size(MAX_VECTOR_BITS / CHAR_BIT)));	// Widest register available
+static_assert(MAX_VECTOR_BITS % CHAR_BIT == 0, "Invalid vector size");
 
 typedef u8 u8x2   __attribute__((vector_size(2)));
 typedef u8 u8x4   __attribute__((vector_size(4)));

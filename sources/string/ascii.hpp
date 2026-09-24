@@ -1,6 +1,11 @@
 #pragma once
 #include "core.hpp"
 
+#define IS_SPACE(c)	(gAsciiLut[((unsigned char)(c))] == ASCII_SPACE)
+#define IS_HEX(c)	(gAsciiLut[((unsigned char)(c))] <= ASCII_HEX)
+#define IS_ALNUM(c) (gAsciiLut[((unsigned char)(c))] <= ASCII_LETTERS)
+#define IS_IDENT(c)	(gAsciiLut[((unsigned char)(c))] <= ASCII_IDENT)
+
 enum e_ascii : u8 {
 	ASCII_DIGITS      = 9u,   // 0-9 map to 0-9
 	ASCII_HEX         = 15u,  // A-F / a-f map to 10-16
@@ -20,18 +25,6 @@ enum e_ascii : u8 {
 // 44 ())  45 (*)  46 (+)  47 (,)  48 (/)  49 (:)  50 (;)  51 (=)
 // 52 (@)  53 (&)  54 (')  55 (")  56 (<)  57 (>)  58 (#)  59 (?)
 // 60 ([)  61 (\)  62 (])  63 (^)  64 (`)  65 ({)  66 (|)  67 (})
-
-// === ASCII Helpers =======================================
-#define IS_ASCII(c) ((c) >= 0 && (c) < 128)
-#define IS_DIGIT(c) ((c) >= '0' && (c) <= '9')
-#define IS_UPPER(c) ((c) >= 'A' && (c) <= 'Z')
-#define IS_LOWER(c) ((c) >= 'a' && (c) <= 'z')
-#define IS_ALPHA(c) (IS_LOWER((c) | 32))
-// #define IS_SPACE(c) (((c) == ' ') || ((unsigned char)(c) - (unsigned char)'\t' < 5u))	// LUTLESS version
-#define IS_SPACE(c)	(gAsciiLut[((unsigned char)(c))] == ASCII_SPACE)
-#define IS_HEX(c)	(gAsciiLut[((unsigned char)(c))] <= ASCII_HEX)
-#define IS_ALNUM(c) (gAsciiLut[((unsigned char)(c))] <= ASCII_LETTERS)
-#define IS_IDENT(c)	(gAsciiLut[((unsigned char)(c))] <= ASCII_IDENT)
 
 // Tables
 #ifdef MAIN_FILE

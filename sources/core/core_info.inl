@@ -1,8 +1,8 @@
 #pragma once
 #include <limits>
 #include <climits>
-
-#include "core.hpp"
+#include <stdint.h>
+#include <cstddef>
 
 /* Acts as an expansion to sizeof function:
 	sizeof_bits:	number of bits of that type
@@ -14,8 +14,17 @@
 
 #define WORD_SIZE	sizeof(size_t)
 #define WORD_BITS	(WORD_SIZE * CHAR_BIT)
-
 #define MAX_PATH_SIZE (4096ul)
+
+#if defined(__AVX512F__)
+	#define MAX_VECTOR_BITS 512
+#elif defined(__AVX2__) || defined(__AVX__) || defined(__LASX__)
+	#define MAX_VECTOR_BITS 256
+#elif defined(__ARM_FEATURE_SVE_BITS) && __ARM_FEATURE_SVE_BITS
+	#define MAX_VECTOR_BITS __ARM_FEATURE_SVE_BITS
+#else
+	#define MAX_VECTOR_BITS 128
+#endif
 
 #ifdef PIPE_BUF
 	#if PIPE_BUF > 4096
@@ -56,7 +65,7 @@ constexpr unsigned long long operator""_KB(unsigned long long x) {
 }
 
 template <typename Type>
-static constexpr usize sizeof_bits(const Type&) {
+static constexpr size_t sizeof_bits(const Type&) {
 	return sizeof(Type) * CHAR_BIT;
 }
 
@@ -70,32 +79,32 @@ static constexpr Type sizeof_min(const Type&) {
 	return std::numeric_limits<Type>::lowest();
 }
 
-template <typename Type, usize Count>
-static constexpr usize sizeof_array(const Type (&)[Count]) {
+template <typename Type, size_t Count>
+static constexpr size_t sizeof_array(const Type (&)[Count]) {
 	return Count;
 }
 
 template <typename Type>
-static constexpr usize sizeof_digits8(const Type&) {
+static constexpr size_t sizeof_digits8(const Type&) {
 	return (sizeof(Type) * CHAR_BIT + 2) / 3;
 }
 
 template <typename Type>
-static constexpr usize sizeof_digits10(const Type&) {
+static constexpr size_t sizeof_digits10(const Type&) {
 	return std::numeric_limits<Type>::digits10 + 1;
 }
 
 template <typename Type>
-static constexpr usize sizeof_digits16(const Type&) {
+static constexpr size_t sizeof_digits16(const Type&) {
 	return (sizeof(Type) * CHAR_BIT + 3) / 4;
 }
 
 template <>
-constexpr f32 sizeof_min<f32>(const f32&) {
-	return -std::numeric_limits<f32>::max();
+constexpr float sizeof_min<float>(const float&) {
+	return -std::numeric_limits<float>::max();
 }
 
 template <>
-constexpr f64 sizeof_min<f64>(const f64&) {
-	return -std::numeric_limits<f64>::max();
+constexpr double sizeof_min<double>(const double&) {
+	return -std::numeric_limits<double>::max();
 }

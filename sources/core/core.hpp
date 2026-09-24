@@ -1,11 +1,10 @@
 #pragma once
 #include <cstddef>
 #include <stdint.h>
+#include "core_info.inl"
 #include "core_types.inl"
-#include "core_generic.inl"
-#include "core_ascii.inl"
-#include "core_bits.inl"
-#include "core_builtins.inl"
+#include "core_portability.inl"
+#include "core_macros.inl"
 
 // New Keywords
 #define restrict			__restrict__
@@ -19,7 +18,7 @@
 #endif
 
 #define ATTR(kind, ...) ATTR_##kind __attribute__((__VA_ARGS__))
-#define ATTR_none
+#define ATTR_default	// No inline or static specifier
 #define ATTR_noinl __attribute__((noinline))
 #define ATTR_inl inline __attribute__((always_inline))
 #define ATTR_static static
@@ -31,7 +30,7 @@
 // flatten: Function calls inside this function are aggressively inlined
 // __attribute__((section("compressed")))
 
-#define PRINT_LN(fd, str)		((void)!::write(fd, str "\n", sizeof(str)))
+#define PRINT_LN(fd, str)		((void)!WRITE(fd, str "\n", sizeof(str)))
 #define PERR_RETURN(value, str)	return (PRINT_LN(2, str), (value))
 #define PERR_EXIT(value, str)	_exit((PRINT_LN(2, str), (value)))
 
@@ -53,6 +52,3 @@
 	#define ON_DEBUG(x) ((void)0)
 	#define ASSERT(x, str) ((void)0)
 #endif
-
-#include "core_builtins.inl"
-#include "core_info.inl"
