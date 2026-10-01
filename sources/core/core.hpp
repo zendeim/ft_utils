@@ -5,6 +5,13 @@
 #include "core_types.inl"
 #include "core_portability.inl"
 #include "core_macros.inl"
+#include "core_new.inl"
+
+/*	This header targets:
+	Architectures: x86-64 and AArch64
+	Compilers: GCC and Clang
+	Languages: C and C++
+*/
 
 // New Keywords
 #define restrict			__restrict__
@@ -37,7 +44,6 @@
 #define UNREACHABLE()	__builtin_unreachable()
 #define LIKELY(x)		__builtin_expect(!!(x), 1)
 #define UNLIKELY(x)		__builtin_expect(!!(x), 0)
-#define ENFORCE(x, str) (ASSERT(x, str), ASSUME(x))
 
 #if defined(__clang__)
 	#define ASSUME(x)	__builtin_assume(x)
@@ -48,7 +54,9 @@
 #ifdef DEBUG_MODE
 	#define ON_DEBUG(x) (x)
 	#define ASSERT(x, str) ((x) != 0 ? (void)0 : (PRINT_LN(2, str), __builtin_trap()))
+	#define ENFORCE(x, str) (ASSERT(x, str))
 #else
 	#define ON_DEBUG(x) ((void)0)
 	#define ASSERT(x, str) ((void)0)
+	#define ENFORCE(x, str) (ASSUME(x))
 #endif

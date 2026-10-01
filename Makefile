@@ -17,11 +17,11 @@ OBJ = $(addprefix $(OBJ_PATH)/, $(SRC:.cpp=.o))
 CXX = clang++
 CPPFLAGS = $(addprefix -I,$(VPATH))
 CXXFLAGS = -Wall -Wextra -O2 -std=c++23 -fno-exceptions
-LDFLAGS = -nostdlib++ # Insane that just linking with stdlib++ accrues a 70kb allocation for exception pools (WITH EXCEPTIONS DISABLED!)
+LDFLAGS = #-nostdlib++ # Insane that just linking with stdlib++ accrues a 70kb allocation for exception pools (WITH EXCEPTIONS DISABLED!)
 DEBUG = -g -DDEBUG_MODE -O0 -Wpedantic -Wshadow -Wcast-qual -Wfloat-equal -Wswitch-default -Wconversion -Wsign-conversion
 ASAN = -fsanitize=address,undefined,leak -fno-omit-frame-pointer
 TSAN = -fsanitize=thread -fno-omit-frame-pointer
-FAST = -march=native -O3 -ffast-math -fstrict-aliasing
+FAST = -march=native -O3 -ffast-math -fstrict-aliasing -mrecip
 
 WARN_IGNORE = -Wno-gnu-statement-expression-from-macro-expansion -Wno-gnu-anonymous-struct -Wno-gnu-auto-type
 

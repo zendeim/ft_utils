@@ -7,8 +7,8 @@
 #include "core.hpp"
 #include "HWTimer.hpp"
 #include "Random.hpp"
-#include "Xoroshiro128_simd.hpp"
-#include "pure_functions.hpp"
+#include "Xoroshiro128.hpp"
+#include "memchr.hpp"
 
 // #include <sys/mman.h>
 // u8* buffer = (u8*)mmap(nullptr, 2_GB, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
@@ -17,10 +17,10 @@
 // TODO: Create a shuffle, randperm function, a create weighted batch function
 
 ATTR(noinl, flatten, aligned(64))
-void* memchr_libc(void* vstr, u8 c, usize length) {	return fn::q32memchr(vstr, c, length); }
+void* memchr_libc(void* vstr, u8 c, usize length) {	return q32memchr(vstr, c, length); }
 
 ATTR(noinl, flatten, aligned(64))
-void* memchr_q32(void* vstr, u8 c, usize length) {	return fn::q32memchr(vstr, c, length); }
+void* memchr_q32(void* vstr, u8 c, usize length) {	return q32memchr(vstr, c, length); }
 
 #define BUFFERSIZE 128_MB
 #define NUM_EPOCHS 8_MB

@@ -9,7 +9,7 @@
 // If 0, it will run CPUID, and if that fails, calibration
 #define TSC_FREQUENCY 0
 #define TSC_FACTOR 3932232912438853884
-STATIC_ASSERT(TSC_FREQUENCY == 0 || TSC_FREQUENCY > 1_G);
+static_assert(TSC_FREQUENCY == 0 || TSC_FREQUENCY > 1_G);
 
 /*	Hardware Timer using RDTSC:
 

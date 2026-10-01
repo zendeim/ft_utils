@@ -1,30 +1,23 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   float_math.c                                       :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: adeimlin <adeimlin@student.42porto.com>    +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/13 10:28:32 by adeimlin          #+#    #+#             */
-/*   Updated: 2026/05/08 22:33:16 by adeimlin         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+#include "core.hpp"
 
-#include <stdint.h>
-#include <stddef.h>
+// Original doom algorithm
+f32	qinvsqrt(f32 number) {
+	u32 uNum = 0x5f3759df - (BITCAST(u32, number) >> 1);
+	f32 fNum = BITCAST(float, uNum);
+	fNum = fNum * (1.5f - (number * 0.5f * fNum * fNum));
+	return (fNum);
+}
 
-// This is faster than receiving a t_32 (thank god)
-float	ft_qinvsqrt(float number) {
-	t_32	result;
+// Modified doom algorithm
+f32 inv_sqrt(f32 number) {
+	u32 uNum = 0x5F1FFFF9ul - (BITCAST(u32, number) >> 1);
+	f32 fNum = BITCAST(f32, uNum);
 
-	result.f = number;
-	result.u = 0x5f3759df - (result.u >> 1);
-	result.f = result.f * (1.5f - (number * 0.5f * result.f * result.f));
-	return (result.f);
+	return 0.703952253f * fNum * (2.38924456f - number * fNum * fNum);
 }
 
 // Check length division
-float	ft_average(float *array, size_t length) {
+float ft_average(float *array, size_t length) {
 	float	sum;
 	size_t	i;
 

@@ -26,6 +26,8 @@
 	#define MAX_VECTOR_BITS 128
 #endif
 
+#define MAX_VECTOR_BYTES (MAX_VECTOR_BITS / CHAR_BIT)
+
 #ifdef PIPE_BUF
 	#if PIPE_BUF > 4096
 		#define ATOMIC_IOSIZE 4096
