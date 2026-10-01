@@ -6,14 +6,13 @@ void* qmemchr_sent(void* vptr, u8 c, usize length) {
 	u8* end = str + length;
 	u8 tmp = *end;
 	*end = c;
-
 	const u8x64 needle = (u8x64){0} + c;
 
 	while (true) {
-		u8x64 block = *(const u8x64*)str;
+		u8x64 block;
+		MEMCPY_INLINE(&block, str, 64);
 		u8x64 eq = block == needle;
-		u1x512 mask_ = __builtin_convertvector(eq, u1x512);
-		u64 mask = BITCAST(u64, mask_);
+		u64 mask = BITCAST(u64, __builtin_convertvector(eq, u1x512));
 		usize matchIndex = TZCNT(mask);
 		if (matchIndex != 64) {
 			str += matchIndex;
@@ -82,24 +81,6 @@ void* q32memchr_b(void* vptr, u8 c, usize length) {
 	return NULL;
 }
 
-ATTR(static_inl)
-void* q64memchr_b(const void* vptr, u8 c, usize length) {
-	u8* str = (u8*)vptr;
-	u8* end = str + length;
-	const u8x64 needle = (u8x64){0} + c;
-	do {
-		u8x64 block;
-		MEMCPY_INLINE(&block, str, 64);
-		u8x64 eq = block == needle;
-		u64 mask = BITCAST(u64, __builtin_convertvector(eq, bool __attribute__((ext_vector_type(64)))));
-		if (mask) {
-			void* result = (void*)(str + TZCNT(mask));
-			return result < end ? result : NULL;
-		}
-		str += 64;
-	} while (str < end);
-	return NULL;
-}
 
 /*	Consider this strategy:
 	First, a 64 byte load is done regardless of straddling; 
@@ -109,4 +90,3 @@ void* q64memchr_b(const void* vptr, u8 c, usize length) {
 	a) align to the next 64 byte address (some bytes may be repeat scans, doesn't matter)
 	b) scan while str < end (rawmemchr would be while true)
 */
-

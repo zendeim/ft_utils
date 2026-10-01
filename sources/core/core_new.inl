@@ -1,12 +1,6 @@
 #pragma once
 #include "core.hpp"
 
-#if defined(__x86_64__) || defined(__i386__)
-	#include <x86intrin.h>
-#elif defined(__aarch64__)
-	#include <arm_neon.h>
-#endif
-
 #ifndef __cplusplus
 	#define auto __auto_type
 	#define static_assert(cond, msg) _Static_assert(cond, msg)
@@ -35,7 +29,7 @@
 
 // Does not
 // Ideally this should be vectorizable from the same instruction
-#if defined(__x86_64__) || defined(__i386__)
+#if defined(__x86_64__)
 	#define QRSQRT(x) _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(x)));
 #elif defined(__aarch64__)
 	#define QRSQRT(x) vrsqrtes_f32(x);

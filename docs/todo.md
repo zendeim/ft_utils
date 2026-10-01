@@ -14,3 +14,5 @@
 
 5. Write a module for vector intrinsics
 	This would enable specialization when necessary and to isolate clang's requirement
+
+6. Write the allocator

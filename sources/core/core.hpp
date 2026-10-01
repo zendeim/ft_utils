@@ -1,9 +1,9 @@
 #pragma once
 #include <cstddef>
 #include <stdint.h>
+#include "core_portability.inl"
 #include "core_info.inl"
 #include "core_types.inl"
-#include "core_portability.inl"
 #include "core_macros.inl"
 #include "core_new.inl"
 

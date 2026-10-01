@@ -12,36 +12,6 @@
 	sizeof_digits:	number of digits to represent the max size of the type
 */
 
-#define WORD_SIZE	sizeof(size_t)
-#define WORD_BITS	(WORD_SIZE * CHAR_BIT)
-#define MAX_PATH_SIZE (4096ul)
-
-#if defined(__AVX512F__)
-	#define MAX_VECTOR_BITS 512
-#elif defined(__AVX2__) || defined(__AVX__) || defined(__LASX__)
-	#define MAX_VECTOR_BITS 256
-#elif defined(__ARM_FEATURE_SVE_BITS) && __ARM_FEATURE_SVE_BITS
-	#define MAX_VECTOR_BITS __ARM_FEATURE_SVE_BITS
-#else
-	#define MAX_VECTOR_BITS 128
-#endif
-
-#define MAX_VECTOR_BYTES (MAX_VECTOR_BITS / CHAR_BIT)
-
-#ifdef PIPE_BUF
-	#if PIPE_BUF > 4096
-		#define ATOMIC_IOSIZE 4096
-	#else
-		#define ATOMIC_IOSIZE PIPE_BUF
-	#endif
-#else
-	#ifdef _POSIX_PIPE_BUF
-		#define ATOMIC_IOSIZE _POSIX_PIPE_BUF
-	#else
-		#define ATOMIC_IOSIZE 512
-	#endif
-#endif
-
 constexpr unsigned long long operator""_G(unsigned long long x) {
 	return x * 1000000000ULL;
 }

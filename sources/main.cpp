@@ -64,9 +64,9 @@ ATTR(noinl, aligned(64))
 void s_test_function(u8* buffer, u128* time, fn_memchr fnPtr) {
 	TestRange range = s_create_random_range(buffer);
 	u8* ptr = buffer + range.start;
-	u64 t0 = HWTimer::get_tsc_gated();
+	u64 t0 = HWTimer::get_tick_gated();
 	void* result = fnPtr(ptr, range.value, range.size);
-	u64 t1 = HWTimer::get_tsc_gated();
+	u64 t1 = HWTimer::get_tick_gated();
 	time[range.bucketIdx] += (t1 - t0);
 	throwaway += (usize)result;
 	*range.ptr = range.old;

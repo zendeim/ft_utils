@@ -7,8 +7,7 @@
 #include "core.hpp"
 #include "HWTimer.hpp"
 #include "Random.hpp"
-#include "Xoroshiro128_simd.hpp"
-#include "pure_functions.hpp"
+#include "Xoroshiro128.hpp"
 
 // Permute function (could operate on indexes)
 
@@ -19,13 +18,12 @@ void create_random_batch(u8* buffer) {
 	u64 value[8] = {16, 32, 64, 128, 512, 1024, 4096, 8192};
 	u64 weights[8] = {64, 32, 16, 16, 8, 8, 8, 1};
 
-
 }
 
 template <typename Type>
 void shuffle16(Type* data, u16 length) {
 	for (; length > 17; length--) {
-		u16x16 randomValues = (u16x16) Xoroshiro128::next4();
+		u16x16 randomValues = (u16x32) Xoroshiro128::next_batch();
 		const u8 targetLength = length - 16;
 		for (; length > targetLength; length--) {
 			usize swapIndex = (u16)(((u32)randomValues[length] * length) >> 16);
@@ -33,7 +31,7 @@ void shuffle16(Type* data, u16 length) {
 		}
 	}
 
-	u16x16 randomValues = (u16x16) Xoroshiro128::next4();
+	u16x16 randomValues = (u16x16) Xoroshiro128::next_batch();
 	for (; length > 1; length--) {
 		usize swapIndex = (u16)(((u32)randomValues[length] * length) >> 16);
 		SWAP(data[swapIndex], data[length]);

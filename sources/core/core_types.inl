@@ -2,6 +2,7 @@
 #include <cstddef>
 #include <stdint.h>
 
+#include "core_portability.inl"
 #include "core_info.inl"
 
 typedef char				i8;
@@ -12,11 +13,11 @@ typedef int32_t				i32;
 typedef uint32_t			u32;
 typedef int64_t				i64;
 typedef uint64_t			u64;
+typedef __int128			i128;
+typedef unsigned __int128	u128;
 typedef _Float16			f16;
 typedef float				f32;
 typedef double				f64;
-typedef __int128			i128;
-typedef unsigned __int128	u128;
 typedef size_t				usize;
 typedef ptrdiff_t			isize;
 typedef intptr_t			iptr;
@@ -26,10 +27,10 @@ typedef unsigned short		ushort;
 typedef unsigned int		uint;
 typedef unsigned long		ulong;
 
-typedef u8 xmm __attribute__((vector_size(16)));
-typedef u8 ymm __attribute__((vector_size(32)));
-typedef u8 zmm __attribute__((vector_size(64)));
-typedef u8 wmm __attribute__((vector_size(MAX_VECTOR_BYTES)));	// Widest register available
+// typedef u8 xmm __attribute__((vector_size(16)));
+// typedef u8 ymm __attribute__((vector_size(32)));
+// typedef u8 zmm __attribute__((vector_size(64)));
+// typedef u8 wmm __attribute__((vector_size(MAX_VECTOR_BYTES)));	// Widest register available
 
 // Clang Specific
 typedef bool u1x __attribute__((ext_vector_type(MAX_VECTOR_BYTES)));
@@ -40,7 +41,6 @@ typedef bool u1x64 __attribute__((ext_vector_type(8)));
 typedef bool u1x128 __attribute__((ext_vector_type(16)));
 typedef bool u1x256 __attribute__((ext_vector_type(32)));
 typedef bool u1x512 __attribute__((ext_vector_type(64)));
-
 
 typedef u8 u8x __attribute__((vector_size(MAX_VECTOR_BYTES)));
 typedef u16 u16x __attribute__((vector_size(MAX_VECTOR_BYTES)));

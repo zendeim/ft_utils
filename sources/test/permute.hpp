@@ -1,5 +1,6 @@
+#pragma once
 #include "core.hpp"
-#include "Xoroshiro128_simd.hpp"
+#include "Xoroshiro128.hpp"
 
 // u8 permute8(u8 x, u64 key) {
 // 	x += (u8)key;
